@@ -6,6 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "test": "LOGIN_RATE_LIMIT=1000 node --test --test-concurrency=1 'test/**/*.test.js'",
     "lint": "eslint ."
   },
   "license": "MIT",
