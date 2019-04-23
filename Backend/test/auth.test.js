@@ -68,6 +68,17 @@ describe("accounts and sessions", () => {
     assert.equal((await voter.get("/voter/homepage")).status, 200);
   });
 
+  it("reports the session state without a 401 for the browser client", async () => {
+    const anon = await request(app).get("/session");
+    assert.equal(anon.status, 200);
+    assert.equal(anon.body.data, null);
+
+    await h.makeUser({ roll: "22F-0013" });
+    const agent = await h.signedIn(app, "22F-0013");
+    const mine = await agent.get("/session");
+    assert.equal(mine.body.data.roll_number, "22F-0013");
+  });
+
   it("ends the session on sign-out", async () => {
     await h.makeUser({ roll: "22F-0009" });
     const agent = await h.signedIn(app, "22F-0009");

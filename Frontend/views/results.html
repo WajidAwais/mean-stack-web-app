@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Results · e-Ballot</title>
+  <meta name="description" content="Online ballot for university batch representative elections.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono&family=Source+Sans+3:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/ballot.css">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/results.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="masthead">
+    <div class="masthead__inner">
+      <a class="wordmark" data-home href="index.html">e-<span>Ballot</span></a>
+      <nav aria-label="Main">
+        <a href="index.html" data-home>Home</a>
+        <a href="results.html" aria-current="page">Results</a>
+        <span class="whoami" id="whoami"></span>
+        <a href="index.html" id="sign-out">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <h1>Results by batch</h1>
+    <p class="lede">The candidate with the most votes in each batch is marked in red. A tie lists every leader; a batch with no votes yet has no winner.</p>
+    <p class="loading" id="results-loading">Counting ballots</p>
+    <p class="notice" id="results-status" role="status" aria-live="polite"></p>
+    <div class="results" id="results"></div>
+  </main>
+</body>
+</html>

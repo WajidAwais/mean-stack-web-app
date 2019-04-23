@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile · e-Ballot</title>
+  <meta name="description" content="Online ballot for university batch representative elections.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono&family=Source+Sans+3:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/ballot.css">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/profile.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="masthead">
+    <div class="masthead__inner">
+      <a class="wordmark" data-home href="index.html">e-<span>Ballot</span></a>
+      <nav aria-label="Main">
+        <a href="index.html" data-home>Home</a>
+        <a href="profile.html" aria-current="page">Profile</a>
+        <span class="whoami" id="whoami"></span>
+        <a href="index.html" id="sign-out">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <h1>Your profile</h1>
+    <div class="split">
+      <section class="sheet" aria-labelledby="details-title">
+        <h2 id="details-title">Details</h2>
+        <form id="profile-form">
+          <label>Full name <input name="username" autocomplete="name" maxlength="60"></label>
+          <div class="row">
+            <label>Phone <input name="phone" type="tel" autocomplete="tel"></label>
+            <label>Date of birth <input name="dob" type="date"></label>
+          </div>
+          <label>Address <input name="address" autocomplete="street-address" maxlength="200"></label>
+          <div class="row">
+            <label>Batch <span class="hint">locked once you have voted</span><input name="batch" type="number" min="1" max="9999"></label>
+            <label>Gender <input name="gender" maxlength="20"></label>
+          </div>
+          <button type="submit">Save details</button>
+          <p class="notice" id="profile-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="sheet" aria-labelledby="password-title">
+        <h2 id="password-title">Change password</h2>
+        <form id="password-form">
+          <label>Current password <input name="current_password" type="password" autocomplete="current-password" required></label>
+          <label>New password <span class="hint">at least 8 characters</span><input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+          <button type="submit" class="button--ghost">Change password</button>
+          <p class="notice" id="password-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

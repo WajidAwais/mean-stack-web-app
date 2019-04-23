@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Election office · e-Ballot</title>
+  <meta name="description" content="Online ballot for university batch representative elections.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono&family=Source+Sans+3:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/ballot.css">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/admin.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="masthead">
+    <div class="masthead__inner">
+      <a class="wordmark" data-home href="admin.html">e-<span>Ballot</span></a>
+      <nav aria-label="Main">
+        <a href="admin.html" aria-current="page">Candidates</a>
+        <a href="results.html">Results</a>
+        <a href="profile.html">Profile</a>
+        <span class="whoami" id="whoami"></span>
+        <a href="index.html" id="sign-out">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <h1>Election office</h1>
+    <section class="sheet" aria-labelledby="candidates-title">
+      <h2 id="candidates-title">Candidates</h2>
+      <div class="toolbar">
+        <label>Show batch
+          <select id="batch-filter"><option value="">All batches</option></select>
+        </label>
+      </div>
+      <p class="notice" id="candidates-status" role="status" aria-live="polite"></p>
+      <div class="table-wrap">
+        <table>
+          <caption class="hint" id="candidates-caption">Loading candidates</caption>
+          <thead><tr><th scope="col">Name</th><th scope="col">Roll no.</th><th scope="col">Batch</th><th scope="col">College</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+          <tbody id="candidate-rows"></tbody>
+        </table>
+      </div>
+    </section>
+    <div class="split spaced">
+      <section class="sheet" aria-labelledby="add-title">
+        <h2 id="add-title">Add a candidate</h2>
+        <form id="candidate-form">
+          <label>Full name <input name="username" required maxlength="60"></label>
+          <div class="row">
+            <label>Roll number <input name="roll_num" required class="mono" maxlength="20"></label>
+            <label>Batch <input name="batch" type="number" min="1" max="9999" required></label>
+          </div>
+          <div class="row">
+            <label>School <input name="school" required maxlength="120"></label>
+            <label>College <input name="College" required maxlength="120"></label>
+          </div>
+          <label>Experience <textarea name="Experience" rows="2" maxlength="500"></textarea></label>
+          <label>Skills <span class="hint">comma separated</span><input name="Skills"></label>
+          <button type="submit">Add candidate</button>
+          <p class="notice" id="candidate-form-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="sheet" aria-labelledby="voters-title">
+        <h2 id="voters-title">Find a voter</h2>
+        <form id="voter-search" class="search">
+          <label>Name or roll number <input name="q" required></label>
+          <button type="submit" class="button--ghost">Search</button>
+        </form>
+        <p class="notice" id="voter-status" role="status" aria-live="polite"></p>
+        <ul class="voter-list" id="voter-results"></ul>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

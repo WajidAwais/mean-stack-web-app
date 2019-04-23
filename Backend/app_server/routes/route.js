@@ -24,6 +24,7 @@ router.post("/login", signInLimiter, check.login, ctrlUsers.logIn);
 router.post("/signout", ctrlUsers.logOut);
 router.get("/signout", ctrlUsers.logOut);
 router.get("/me", requireLogin, ctrlUsers.viewProfile);
+router.get("/session", ctrlUsers.currentSession);
 
 router.get("/voter/homepage", voter, ctrlCandidates.getOwnBatchList);
 router.get("/voter/view_candidate_list", voter, ctrlCandidates.getCandidateList);

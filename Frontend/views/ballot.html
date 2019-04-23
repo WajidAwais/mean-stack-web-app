@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your ballot · e-Ballot</title>
+  <meta name="description" content="Online ballot for university batch representative elections.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=IBM+Plex+Mono&family=Source+Sans+3:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/ballot.css">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/ballot.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="masthead">
+    <div class="masthead__inner">
+      <a class="wordmark" data-home href="ballot.html">e-<span>Ballot</span></a>
+      <nav aria-label="Main">
+        <a href="ballot.html" aria-current="page">Ballot</a>
+        <a href="results.html">Results</a>
+        <a href="profile.html">Profile</a>
+        <span class="whoami" id="whoami"></span>
+        <a href="index.html" id="sign-out">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <div class="split split--wide">
+      <section class="sheet" aria-labelledby="ballot-title">
+        <form id="ballot-form">
+          <fieldset class="ballot">
+            <legend id="ballot-title">Ballot paper</legend>
+            <p class="lede" id="ballot-intro">Mark one box, then cast your ballot. You cannot change it afterwards.</p>
+            <p class="loading" id="ballot-loading">Loading candidates</p>
+            <ul class="ballot__list" id="ballot-list"></ul>
+          </fieldset>
+          <button type="submit" id="cast-button" hidden>Cast ballot</button>
+          <p class="notice" id="ballot-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <aside class="sheet" aria-labelledby="status-title">
+        <h2 id="status-title">Your ballot</h2>
+        <div id="vote-state"><p class="loading">Checking</p></div>
+        <p><a href="results.html">See the standings for every batch</a></p>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

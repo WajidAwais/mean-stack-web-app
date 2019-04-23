@@ -68,6 +68,12 @@ module.exports.logOut = async function logOut(req, res) {
   send(res, 200, null, "signed out");
 };
 
+// Lets the browser client ask "who am I?" without a 401 when signed out.
+module.exports.currentSession = async function currentSession(req, res) {
+  const user = req.session.userId ? await usersdb.findById(req.session.userId) : null;
+  send(res, 200, user, user ? "signed in" : "signed out");
+};
+
 module.exports.viewProfile = function viewProfile(req, res) {
   send(res, 200, req.user, "found");
 };

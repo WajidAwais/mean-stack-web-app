@@ -9,6 +9,7 @@ const route = require("./app_server/routes/route");
 const { notFound, handleError } = require("./app_server/middleware/respond");
 
 const SESSION_TTL_SECONDS = 8 * 60 * 60;
+const FRONTEND = path.join(__dirname, "..", "Frontend");
 
 function sessionSecret() {
   if (process.env.SESSION_SECRET) return process.env.SESSION_SECRET;
@@ -23,7 +24,13 @@ function createApp() {
   app.disable("x-powered-by");
   if (process.env.TRUST_PROXY) app.set("trust proxy", process.env.TRUST_PROXY);
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      // The app is often served over plain HTTP inside Docker or on a LAN;
+      // forcing https sub-requests there would break every stylesheet.
+      contentSecurityPolicy: { directives: { upgradeInsecureRequests: null } },
+    }),
+  );
   // JSON only: browsers cannot send a cross-site JSON body without CORS,
   // which together with SameSite cookies keeps state-changing calls same-site.
   app.use(express.json({ limit: "20kb" }));
@@ -48,7 +55,8 @@ function createApp() {
     }),
   );
 
-  app.use(express.static(path.join(__dirname, "public")));
+  app.use(express.static(path.join(FRONTEND, "views")));
+  app.use("/assets", express.static(path.join(FRONTEND, "assets")));
   app.use("/", route);
   app.use(notFound);
   app.use(handleError);
