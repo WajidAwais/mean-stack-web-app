@@ -1,0 +1,44 @@
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+tmp/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.github/
+
+# Proposal document: kept on disk only (it contains a national-ID-shaped
+# sample number that may belong to a real person)
+Proposal/*.docx
+
+# Unreferenced leftovers from an earlier movie-ticketing exercise
+# (third-party posters, cinema photos and lecture slides); never used by the app
+Backend/public/img/posters/
+Backend/public/img/cinema/
+Backend/public/img/cinefoot/
+Backend/public/img/thumbnails/
+Backend/public/img/core-img/05_User_Profiling.pdf
+Backend/public/img/core-img/fanti.jpg
+Backend/public/img/core-img/team_dp.jpg
+Backend/public/img/core-img/team_dp_2.jpg
+Backend/public/img/core-img/w1.jpg
+Backend/public/img/core-img/log.jpg
+Backend/public/img/core-img/log1.png
+Backend/public/img/core-img/logo.jpg
+Backend/public/img/core-img/logo1.png
