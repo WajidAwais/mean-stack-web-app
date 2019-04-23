@@ -1,117 +1,58 @@
-var express = require("express");
-var mongoose = require("mongoose");
-var db1 = require("./app_server/models/db");
-var db = db1.connection;
-var bodyparser = require('body-parser');
-var http = require("http");
-var expressValidator=require('express-validator');
-var session =require('express-session');
-//var db = model.connection;
-//var bodyparser = require('body-parser');
-//var cors = require("cors");
-var MongoStore = require("connect-mongo")(session);
-var path = require("path");
-//var session = require('express-session');
-var app = express();
-//const ejsLint = require("ejs-lint");
-//define route
-app.use(bodyparser.urlencoded({ extended: false }));
-//app.use(require('connect').bodyParser());
+const path = require("path");
+const express = require("express");
+const session = require("express-session");
+const helmet = require("helmet");
+const { MongoStore } = require("connect-mongo");
 
-app.use(bodyparser.json());
-app.use(bodyparser.json({ type: 'application/vnd.api+json' }))
-
-
-
-
-
-app.use(expressValidator());
-app.set("views", path.join(__dirname, "app_server", "views"));
-//adding static files
-app.use(express.static(path.join(__dirname, "public")));
-
-
-app.engine('html', require('ejs').__express);
-app.set('view engine','html');
-app.set("views", path.join(__dirname, "app_server", "views"));
-//app.set("view engine", "html");
-
-//app.engine("html", require("ejs").renderFile);
-
-
-
-
-
-
-
-
-//routes
+const { mongoose } = require("./app_server/models/db");
 const route = require("./app_server/routes/route");
-app.use("/", route);
-global.globalstring="";
+const { notFound, handleError } = require("./app_server/middleware/respond");
 
+const SESSION_TTL_SECONDS = 8 * 60 * 60;
 
-
-//sessions for tracking logins
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "dev-only-session-secret",
-    resave: true,
-    saveUninitialized: false,
-    maxAge: new Date(Date.now() + 36000),
-    store: new MongoStore({
-      mongooseConnection: db,
-      collection: 'sessions',
-      
-      url:'mongodb://localhost:27017/data'
-    })
-  })
-);
-
-/*
-app.get('/signout',function(req,res){
-req.session.destroy(function(err) {
-  if(err) {
-    console.log(err);
-  } else {
-    res.redirect('/');
+function sessionSecret() {
+  if (process.env.SESSION_SECRET) return process.env.SESSION_SECRET;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET must be set in production");
   }
-});
-
-});
-*/
-
-var port = normalizePort(process.env.PORT || "3000");
-app.set("port", port);
-
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-
-/**
- * Normalize a port into a number, string, or false.
- */
-
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
+  return "dev-only-session-secret";
 }
+
+function createApp() {
+  const app = express();
+  app.disable("x-powered-by");
+  if (process.env.TRUST_PROXY) app.set("trust proxy", process.env.TRUST_PROXY);
+
+  app.use(helmet());
+  // JSON only: browsers cannot send a cross-site JSON body without CORS,
+  // which together with SameSite cookies keeps state-changing calls same-site.
+  app.use(express.json({ limit: "20kb" }));
+
+  app.use(
+    session({
+      name: "eballot.sid",
+      secret: sessionSecret(),
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.COOKIE_SECURE === "true",
+        maxAge: SESSION_TTL_SECONDS * 1000,
+      },
+      store: MongoStore.create({
+        clientPromise: mongoose.connection.asPromise().then((conn) => conn.getClient()),
+        collectionName: "sessions",
+        ttl: SESSION_TTL_SECONDS,
+      }),
+    }),
+  );
+
+  app.use(express.static(path.join(__dirname, "public")));
+  app.use("/", route);
+  app.use(notFound);
+  app.use(handleError);
+  return app;
+}
+
+module.exports = { createApp };

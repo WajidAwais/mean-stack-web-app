@@ -1,22 +1,17 @@
-var mongoose = require("mongoose");
-var dbURI = process.env.MONGODB_URI || "mongodb://localhost:27017/data";
-mongoose.connect(
-  dbURI,
-  { useNewUrlParser: true }
-);
-mongoose.Promise = global.Promise;
-//on connection
-mongoose.connection.on("connected", () => {
-  console.log("connected to db mongodb");
-});
+const mongoose = require("mongoose");
 
-//on error
-mongoose.connection.on("error", err => {
-  if (err) {
-    console.log("error in db connection" + err);
-  }
-});
+// Wrap any `$`-prefixed keys that reach a filter in `$eq`, so a request body
+// like {"roll_number": {"$ne": ""}} can never turn into a query operator.
+mongoose.set("sanitizeFilter", true);
+mongoose.set("strictQuery", true);
 
-//require("./showtimedb");
+const DEFAULT_URI = "mongodb://localhost:27017/eballot";
+
+function connect(uri = process.env.MONGODB_URI || DEFAULT_URI) {
+  return mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+}
+
 require("./candidate1");
-require('./usersdb');
+require("./usersdb");
+
+module.exports = { connect, mongoose };

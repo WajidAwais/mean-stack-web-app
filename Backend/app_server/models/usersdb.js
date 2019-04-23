@@ -1,139 +1,57 @@
-const mongoose = require('mongoose');
-var bcrypt = require('bcryptjs');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
+const BCRYPT_ROUNDS = 10;
 
-        
-//define schema herey
-const user_schema=mongoose.Schema({
-    
-    username : {
-        type : String,
-        //required : true
-
-    },
-    password : {
-        type : String,
-       // required : true
-
-    },
-    roll_number: {
-        
-        type : String,
-       unique: true
-        //required : true
-
-    },
-    CNIC : {
-        type : String,
-      //  required : true
-
-    },
-    dob : {
-      type : Date,
-       // required : true
-
-    },
-    Address : {
-      type : String,
-//required : true
-
-    },
-    Gender: {
-      type: String,
-     // required: true
-    },
-    Batch : {
-      type: Number,
-     // required: true
-    },
-    guardian_cnic: {
-      type: String,
-     // required: true
-
-    },
-    votedFor:{
-      type: String,
-       // required: true
-    },
-    phone_number:{
-      type: String,
-     // required: true
-    },
-    type :{
-      type: Boolean,
-     // required: true
-    }
-
-    
+// Field names follow the original 2019 schema so existing data still loads.
+// `type` is true for voters and false for admins, as in the API proposal.
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, trim: true },
+  password: { type: String, required: true, select: false },
+  roll_number: { type: String, required: true, unique: true, trim: true },
+  CNIC: { type: String, trim: true },
+  dob: { type: Date },
+  Address: { type: String, trim: true },
+  Gender: { type: String, trim: true },
+  Batch: { type: Number },
+  guardian_cnic: { type: String, trim: true },
+  votedFor: { type: String, default: null },
+  phone_number: { type: String, trim: true },
+  type: { type: Boolean, required: true },
 });
 
-//authenticate input against database
-user_schema.statics.authenticate = function(roll_number, password, callback) {
-    usersdb.findOne({ roll_number: roll_number }).exec(function(err, user) {
-      if (err) { 
-        Console.log("error in authenticate");  
-        return callback(err); 
-      } else if (!user) { 
-        var err = new Error("User not found.");
-        err.status = 401;
-        return callback(err);
-      }
-      bcrypt.compare(password, user.password, function(err, result) { 
-        if (result === true) {  
-          return callback(null, user);
-        } else {  
-          return callback();  
-        } 
-      });  
-    });  
-  };
-  
-  //hashing a password before saving it to the database 
-  user_schema.pre("save", function(next) {
-    var user = this; 
-    bcrypt.hash(user.password, 10, function(err, hash) { 
-      if (err) {
-        return next(err);
-      }
-      user.password = hash; 
-      next();
-    }); 
-  });  
-  
-var usersdb = mongoose.model("usersdb", user_schema);
-module.exports = usersdb;
+userSchema.pre("save", async function hashPassword() {
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, BCRYPT_ROUNDS);
+  }
+});
 
-module.exports.createUser = function(newUser, callback){
-	bcrypt.genSalt(10, function(err, salt) {
-	    bcrypt.hash(newUser.password, salt, function(err, hash) {
-	        newUser.password = hash;
-	        newUser.save(callback);
-	    });
-	});
-}
-module.exports.updateuser = function(newUser, callback){
-	bcrypt.genSalt(10, function(err, salt) {
-	    bcrypt.hash(newUser.password, salt, function(err, hash) {
-	        newUser.password = hash;
-	        newUser.save(callback);
-	    });
-	});
-}
+userSchema.methods.checkPassword = function checkPassword(plain) {
+  return bcrypt.compare(plain, this.password);
+};
 
-module.exports.getUserByUsername = function(username, callback){
-	var query = {username: username};
-	User.findOne(query, callback);
-}
+userSchema.virtual("role").get(function role() {
+  return this.type ? "voter" : "admin";
+});
 
-module.exports.getUserById = function(id, callback){
-	User.findById(id, callback);
-}
+// Never send the hash, and keep the ballot secret: callers only learn
+// whether someone has voted, not for whom.
+userSchema.set("toJSON", {
+  virtuals: true,
+  transform(doc, ret) {
+    ret.hasVoted = Boolean(ret.votedFor);
+    delete ret.password;
+    delete ret.votedFor;
+    delete ret.__v;
+    delete ret.id;
+    return ret;
+  },
+});
 
-module.exports.comparePassword = function(candidatePassword, hash, callback){
-	bcrypt.compare(candidatePassword, hash, function(err, isMatch) {
-    	if(err) throw err;
-    	callback(null, isMatch);
-	});
-}
+userSchema.statics.authenticate = async function authenticate(rollNumber, password) {
+  const user = await this.findOne({ roll_number: rollNumber }).select("+password");
+  if (!user || !(await user.checkPassword(password))) return null;
+  return user;
+};
 
-//var usersdb = module.exports = mongoose.model('usersdb',user_schema); 
+module.exports = mongoose.model("usersdb", userSchema);
